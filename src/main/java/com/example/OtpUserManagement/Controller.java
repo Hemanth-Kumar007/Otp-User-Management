@@ -1,6 +1,7 @@
 package com.example.OtpUserManagement;
 
 import com.example.OtpUserManagement.Dto.AddUser;
+import com.example.OtpUserManagement.Entities.OtpEntity;
 import com.example.OtpUserManagement.Entities.UserEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -15,19 +16,15 @@ public class Controller {
 
     @PostMapping("/sendOtp")
     public ResponseEntity sendOtp(@RequestParam String phoneNumber){
-        try {
-            serviceObj.sendOtp(phoneNumber);
-            return new ResponseEntity("OTP sent successfully", HttpStatus.OK);
-        }
-        catch (Exception e){
-            return new ResponseEntity("Failed to send OTP", HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+            OtpEntity otpEntity = serviceObj.sendOtp(phoneNumber);
+            return new ResponseEntity("Otp is "+otpEntity.getOtp()+"\n"+"Expiration Time is "+otpEntity.getExpirationTime()
+                    , HttpStatus.OK);
     }
 
     @PostMapping("/verifyOtp")
     public ResponseEntity verifyOtp(@RequestParam String phoneNumber, @RequestParam String otp) {
         if (serviceObj.verifyOtp(phoneNumber, otp)) {
-            return new ResponseEntity("OTP is valid", HttpStatus.OK);
+            return new ResponseEntity("OTP is valid" , HttpStatus.OK);
         }
         else {
             return new ResponseEntity("Invalid OTP", HttpStatus.UNAUTHORIZED);
@@ -35,13 +32,13 @@ public class Controller {
     }
 
     @PostMapping("/addUserDetails")
-    public ResponseEntity addUser(@RequestBody AddUser addUserBody){
+    public ResponseEntity<String> addUser(@RequestBody AddUser addUserBody){
         try{
             serviceObj.addUser(addUserBody);
-            return new ResponseEntity("User is added", HttpStatus.OK);
+            return ResponseEntity.ok("User is added");
         }
        catch (Exception e){
-            return new ResponseEntity("User not added", HttpStatus.BAD_REQUEST);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("User is not added");
         }
     }
 
@@ -55,5 +52,10 @@ public class Controller {
         else{
             return new ResponseEntity("UserName is not valid", HttpStatus.BAD_REQUEST);
         }
+    }
+
+    @GetMapping("/test")
+    public String test(){
+        return "Test successful";
     }
 }

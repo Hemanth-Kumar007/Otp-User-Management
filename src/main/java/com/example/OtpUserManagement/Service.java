@@ -20,7 +20,7 @@ public class Service {
     @Autowired
     private UserRepository userRepository;
 
-    public void sendOtp(String phoneNumber){
+    public OtpEntity sendOtp(String phoneNumber){
         String otp = generateOtp();
 
         // Storing OTP in the database with an expiration time
@@ -29,6 +29,8 @@ public class Service {
         otpEntity.setOtp(otp);
         otpEntity.setExpirationTime(LocalDateTime.now().plusMinutes(5));
         otpRepository.save(otpEntity);
+
+        return otpEntity;
     }
 
     private static final String OTP_CHARACTERS = "0123456789"; // Define the characters allowed in the OTP
